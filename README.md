@@ -1,2 +1,2 @@
 # socket
-Esercizi sul livello applicativo
+Esercizi vari
