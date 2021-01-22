@@ -8,12 +8,12 @@ sock_service = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock_service.connect((SERVER_ADDRESS, SERVER_PORT))
 dati = input("Inserisci messaggio per il server: ")
 dati = dati.encode()
-# Send data to server
+# Invia i dati al server
 sock_service.send(dati)
-# Receive response from server
+# Riceve i dati dal server
 dati = sock_service.recv(2048)
 if dati:
-    # Convert back to string for python3
+    # Converte i dati dal formato  byte a stringa
     dati = dati.decode()
     print("Ho ricevuto dal server: ")
     print(dati + '\n')
