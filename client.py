@@ -10,19 +10,22 @@ sock_service = socket.socket()
 sock_service.connect((SERVER_ADDRESS, SERVER_PORT))
 
 print("Connesso a " + str((SERVER_ADDRESS, SERVER_PORT)))
+#1 Spiega a cosa serve il try-except EOFError
 while True:
     try:
-        dati = input("Inserisci i dati da inviare (0 per terminare la connessione): ")
+        dati = input("Inserisci i dati da inviare (digita ko per uscire): ")
     except EOFError:
         print("\nOkay. Exit")
         break
+
     if not dati:
         print("Non puoi inviare una stringa vuota!")
         continue
-    if dati == '0':
-        print("Chiudo la connessione con il server!")
+    if dati=='ko':
+        print("Fine connessione!")
         break
-    
+
+
     dati = dati.encode()
 
     sock_service.send(dati)
