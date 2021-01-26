@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 
+
+input_string = 'Hello'
+print(type(input_string))
+input_bytes_encoded = input_string.encode()
+print(type(input_bytes_encoded))
+print(input_bytes_encoded)
+output_string=input_bytes_encoded.decode()
+print(type(output_string))
+print(output_string)
+
 import socket
 
 SERVER_ADDRESS = '127.0.0.1'
@@ -32,7 +42,7 @@ while True:
     if not dati:
         print("Server non risponde. Exit")
         break
-
+    
     dati = dati.decode()
 
     print("Ricevuto dal server:")
