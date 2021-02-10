@@ -1,44 +1,60 @@
 #!/usr/bin/env python3
 
 import socket
+import sys
 
 SERVER_ADDRESS = '127.0.0.1'
 SERVER_PORT = 22224
 
-sock_service = socket.socket()
 
-sock_service.connect((SERVER_ADDRESS, SERVER_PORT))
+# La funzione riceve la socket connessa al server e la utilizza per richiedere il servizio
+def invia_comandi(sock_service):
+    while True:
+        try:
+            dati = input("Inserisci i dati da inviare (digita ko per uscire): ")
+        except EOFError:
+            print("\nOkay. Exit")
+            break
 
-print("Connesso a " + str((SERVER_ADDRESS, SERVER_PORT)))
-#1 Spiega a cosa serve il try-except EOFError
-while True:
+        if not dati:
+            print("Non puoi inviare una stringa vuota!")
+            continue
+        if dati == 'ko':
+            print("Fine connessione!")
+            break
+
+        dati = dati.encode()
+
+        sock_service.send(dati)
+
+        dati = sock_service.recv(2048)
+
+        if not dati:
+            print("Server non risponde. Exit")
+            break
+
+        dati = dati.decode()
+
+        print("Ricevuto dal server:")
+        print(dati + '\n')
+    sock_service.close()
+
+
+# La funzione crea una socket (s) per la connessione con il server e la passa alla funzione invia_comandi(s)
+def connessione_server(address, port):
     try:
-        dati = input("Inserisci i dati da inviare (digita ko per uscire): ")
-    except EOFError:
-        print("\nOkay. Exit")
-        break
-
-    if not dati:
-        print("Non puoi inviare una stringa vuota!")
-        continue
-    if dati=='ko':
-        print("Fine connessione!")
-        break
+        s = socket.socket()  # creazione socket client
+        s.connect((address, port))  # connessione al server
+        print(f"Connessessione al Server: {address}:{port}")
+    except s.error as errore:
+        print(f"Qualcosa è andato storto, sto uscendo... \n{errore}")
+        sys.exit()
+    invia_comandi(s)
 
 
-    dati = dati.encode()
+if __name__ == '__main__':
+    connessione_server(SERVER_ADDRESS, SERVER_PORT)
 
-    sock_service.send(dati)
-
-    dati = sock_service.recv(2048)
-
-    if not dati:
-        print("Server non risponde. Exit")
-        break
-
-    dati = dati.decode()
-
-    print("Ricevuto dal server:")
-    print(dati + '\n')
-
-sock_service.close()
+# if __name__ == '__main__': consente al nostro codice di capire se stia venendo eseguito come script a se stante,
+# o se è invece stato richiamato come modulo da un qualche programma per usare una o più delle sua varie
+# funzioni e classi.
