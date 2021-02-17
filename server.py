@@ -74,7 +74,7 @@ def avvia_server(indirizzo, porta):
         # altrimenti bisognerebbe aspettare 2-4 minuti prima di poter riutilizzare(bindare) la stessa porta
         sock_listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # Associa indirizzo e porta.  Nota che  l'argumento è una tupla:
-        sock_listen.bind((SERVER_ADDRESS, SERVER_PORT))
+        sock_listen.bind((indirizzo, porta))
         # Imposta quante connessioni pendenti possono essere accodate
         sock_listen.listen(5)
         print("Server in ascolto su %s. Termina con ko" % str((indirizzo, porta)))
