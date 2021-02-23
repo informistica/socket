@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import socket
 import os
+import time
 import multiprocessing
 import threading
 from threading import Thread
@@ -10,16 +11,17 @@ from threading import Thread
 SERVER_ADDRESS = '127.0.0.1'
 # Numero di porta, deve essere >1024 perchè le altre sono riservate.)
 SERVER_PORT = 22224
+#conta le connessioni ricevute da quando il server è avviato
 global num_service 
 
 
 # La funzione avvia_server crea un endpoint di ascolto (sock_listen) dal quale accettare connessioni in entrata
 # la socket di ascolto viene passata alla funzione ricevi_comandi la quale accetta richieste di connessione
-# e per ognuna crea una socket per i dati (sock_service) da cui ricevere le richieste e inviare le risposte
+# e per ognuna crea un thread con la propria socket per i dati (sock_service) da cui ricevere le richieste e inviare le risposte
 
-
+#funzione eseguita serie/thread/processi 
 def ricevi_comandi(sock_service, addr_client,num_service):
-    print("Client PID: %s, Process Name: %s, Thread Name: %s" % (
+    print("Server PID: %s, Process Name: %s, Thread Name: %s" % (
         os.getpid(),
         multiprocessing.current_process().name,
         threading.current_thread().name)
@@ -57,6 +59,7 @@ def ricevi_comandi(sock_service, addr_client,num_service):
         # codifica la stringa in byte
         dati = dati.encode()
         # Invia la risposta al client.
+        time.sleep(1)
         sock_service.send(dati)
     sock_service.close()
 
@@ -71,8 +74,6 @@ def ricevi_connessioni(sock_listen,num_service):
         except:
             print("Il thread non si avvia")
             sock_listen.close()
-
-
 
 def avvia_server(indirizzo, porta):
     try:
