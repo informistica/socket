@@ -1,51 +1,44 @@
 #!/usr/bin/env python3
 import socket
+import os
+import multiprocessing
+import threading
+from threading import Thread
+
 
 # lasciando il campo vuoto sarebbe la stessa cosa (localhost)
 SERVER_ADDRESS = '127.0.0.1'
-
 # Numero di porta, deve essere >1024 perchè le altre sono riservate.)
 SERVER_PORT = 22224
+global num_service 
 
-# Crea la socket
-sock_listen = socket.socket()
 
-# Opzionale: permette di riavviare subito il codice,
-# altrimenti bisognerebbe aspettare 2-4 minuti prima di poter riutilizzare(bindare) la stessa porta
-sock_listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+# La funzione avvia_server crea un endpoint di ascolto (sock_listen) dal quale accettare connessioni in entrata
+# la socket di ascolto viene passata alla funzione ricevi_comandi la quale accetta richieste di connessione
+# e per ognuna crea una socket per i dati (sock_service) da cui ricevere le richieste e inviare le risposte
 
-# Associa indirizzo e porta.  Nota che  l'argumento è una tupla:
-sock_listen.bind((SERVER_ADDRESS, SERVER_PORT))
 
-# Imposta quante connessioni pendenti possono essere accodate
-sock_listen.listen(5)
-
-print("Server in ascolto su %s. Termina con ko" % str((SERVER_ADDRESS, SERVER_PORT)))
-
-# Abbiamo creato un endpoint di ascolto (sock_listen) dal quale accettare connessioni in entrata
-# Il loop accetterà una connessione alla volta e la servirà in una nuova connessione (sock_service) finchè il client non si disconnette
-# dopodichè il server ne accetterà di nuove tra quelle in coda
-
-op = " " #operazione
-n1 = 0   #primo termine
-n2 = 0   #secondo termine
-while True:
-    sock_service, addr_client = sock_listen.accept()
-    print("\nConnessione ricevuta da %s" % str(addr_client))
-    print("\nAspetto di ricevere i dati dell'operazione ")
-
+def ricevi_comandi(sock_service, addr_client,num_service):
+    print("Client PID: %s, Process Name: %s, Thread Name: %s" % (
+        os.getpid(),
+        multiprocessing.current_process().name,
+        threading.current_thread().name)
+    )
+    print(f"Avviato il {num_service} thread per servire le richieste da %s" % str(addr_client))
+    print(f"{threading.current_thread().name} Aspetto di ricevere i dati dell'operazione ")
     while True:
         dati = sock_service.recv(2048)
         if not dati:
-            print("Fine dati dal client. Reset")
+            print(f"{threading.current_thread().name} Fine dati dal client. Reset")
             break
 
         # Decodifica i byte ricevuti in una stringa unicode
         dati = dati.decode()
-        print("Ricevuto: '%s'" % dati)
+        print(f"{threading.current_thread().name} Ricevuto: '%s'" % dati)
         if dati == "ko":
-            print("Fine dati dal client. Exit")
+            print(f"{threading.current_thread().name} Fine dati dal client. Exit")
             break
+        operazione = dati
         op, n1, n2 = dati.split(";")
         if op == "piu":
             dati = str(float(n1) + float(n2))
@@ -54,17 +47,52 @@ while True:
         elif op == "per":
             dati = str(float(n1) * float(n2))
         elif op == "diviso":
-            if n2=='0':
-                dati='Divisione per zero impossibile'
+            if n2 == '0':
+                dati = 'Divisione per zero impossibile'
             else:
                 dati = str(float(n1) / float(n2))
 
         dati = "Il risultato dell'operazione: '" + op + "' tra '" + str(n1) + "' e '" + str(n2) + "' è: '" + dati + "'"
-
+        print(f"{threading.current_thread().name} Invio il risultato dell'operazione %s a %s\n" % (operazione, addr_client))
         # codifica la stringa in byte
         dati = dati.encode()
-
         # Invia la risposta al client.
         sock_service.send(dati)
-
     sock_service.close()
+
+def ricevi_connessioni(sock_listen,num_service):
+    while True:
+        sock_service, addr_client = sock_listen.accept()
+        num_service+=1
+        print("\nConnessione ricevuta da %s" % str(addr_client))
+        print(f"Creo thread per servire la connessione n. {num_service}")
+        try:
+            Thread(target=ricevi_comandi, args=(sock_service, addr_client,num_service)).start()
+        except:
+            print("Il thread non si avvia")
+            sock_listen.close()
+
+
+
+def avvia_server(indirizzo, porta):
+    try:
+        # Crea la socket
+        sock_listen = socket.socket()
+        # Opzionale: permette di riavviare subito il codice,
+        # altrimenti bisognerebbe aspettare 2-4 minuti prima di poter riutilizzare(bindare) la stessa porta
+        sock_listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # Associa indirizzo e porta.  Nota che  l'argumento è una tupla:
+        sock_listen.bind((indirizzo, porta))
+        # Imposta quante connessioni pendenti possono essere accodate
+        sock_listen.listen(5)
+        num_service=0
+        print("Server in ascolto su %s. Termina con ko" % str((indirizzo, porta)))
+    except socket.error as errore:
+        print(f"Qualcosa è andato storto... \n{errore}")
+
+    ricevi_connessioni(sock_listen,num_service)
+
+
+if __name__ == '__main__':
+    avvia_server(SERVER_ADDRESS, SERVER_PORT)
+      
