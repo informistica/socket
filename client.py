@@ -14,7 +14,7 @@ NUM_WORKERS = 15
 
 
 def genera_richieste(address, port):
-    time.sleep(0.1)
+    #time.sleep(0.1)
     start_time_thread = time.time()
     print("Client PID: %s, Process Name: %s, Thread Name: %s" % (
         os.getpid(),
