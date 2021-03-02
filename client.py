@@ -43,9 +43,9 @@ def genera_richieste(address, port):
     dati = dati.decode()
     print(f"{threading.current_thread().name} Ricevuto dal server:")
     print(dati + '\n')
-    #dati = "ko"
-    #dati = dati.encode()
-    #s.send(dati)
+    dati = "ko"
+    dati = dati.encode()
+    s.send(dati)
     s.close
     end_time_thread = time.time()
     print(f"{threading.current_thread().name} execution time =", end_time_thread - start_time_thread)
@@ -53,27 +53,30 @@ def genera_richieste(address, port):
    
 if __name__ == '__main__':
     # Run tasks using serial function
-    start_time = time.time()
+    start_time_0 = time.time()
     for _ in range(0,NUM_WORKERS):
         genera_richieste(SERVER_ADDRESS, SERVER_PORT)
-    end_time = time.time()    
-    print("Total SERIAL time=", end_time - start_time)
+    end_time_0 = time.time()    
+    print("Total SERIAL time=", end_time_0 - start_time_0)
 
     # Run tasks using threads
-    start_time = time.time()
+    start_time_1 = time.time()
     threads = [threading.Thread(target=genera_richieste,args=(SERVER_ADDRESS, SERVER_PORT,)) for _ in range(NUM_WORKERS)]
     [thread.start() for thread in threads]
     [thread.join() for thread in threads]
-    end_time = time.time()
-    print("Total THREADS time=", end_time - start_time)
+    end_time_1 = time.time()
+    print("Total THREADS time=", end_time_1 - start_time_1)
 
      # Run tasks using processes
-    start_time = time.time()
+    start_time_2 = time.time()
     processes = [multiprocessing.Process(target=genera_richieste,args=(SERVER_ADDRESS, SERVER_PORT,)) for _ in range(NUM_WORKERS)]
     [process.start() for process in processes]
     [process.join() for process in processes]
-    end_time = time.time()
-    print("\nTotal PROCESS time=", end_time - start_time)
+    end_time_2 = time.time()
+    print("\nTotal PROCESS time=", end_time_2 - start_time_2)
+    print("Total THREADS time=", end_time_1 - start_time_1)
+    print("Total SERIAL time=", end_time_0 - start_time_0)
+    print("\nTotal SERIAL + THREADS + PROCESS time=", end_time_2 - start_time_0)
     
 # if __name__ == '__main__': consente al nostro codice di capire se stia venendo eseguito come script a se stante,
 # o se è invece stato richiamato come modulo da un qualche programma per usare una o più delle sua varie
