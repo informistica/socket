@@ -73,10 +73,10 @@ if __name__ == '__main__':
     [process.start() for process in processes]
     [process.join() for process in processes]
     end_time_2 = time.time()
-    print("\nTotal PROCESS time=", end_time_2 - start_time_2)
-    print("Total THREADS time=", end_time_1 - start_time_1)
-    print("Total SERIAL time=", end_time_0 - start_time_0)
-    print("\nTotal SERIAL + THREADS + PROCESS time=", end_time_2 - start_time_0)
+    print("\nTotal PROCESS time=", round(end_time_2 - start_time_2,2))
+    print("Total THREADS time=", round(end_time_1 - start_time_1,2))
+    print("Total SERIAL time=", round(end_time_0 - start_time_0,2))
+    print("\nTotal SERIAL + THREADS + PROCESS time=", round(end_time_2 - start_time_0,2))
     
 # if __name__ == '__main__': consente al nostro codice di capire se stia venendo eseguito come script a se stante,
 # o se è invece stato richiamato come modulo da un qualche programma per usare una o più delle sua varie
