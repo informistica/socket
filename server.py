@@ -17,28 +17,27 @@ sock_listen.listen(5)
 
 print("Server in ascolto su %s." % str((SERVER_ADDRESS, SERVER_PORT)))
 
+protocollo=["Receive SYN","Send SYN + ACK", "Receive ACK", "Handshake ok"]
 
 while True:
     sock_service, addr_client = sock_listen.accept()
     print("\nConnessione ricevuta da " + str(addr_client))
     print("\nAspetto di ricevere i dati ")
-    contConn=0
     while True:
         dati = sock_service.recv(2048)
-        contConn+=1
         if not dati:
             print("Fine dati dal client. Reset")
             break
         
         dati = dati.decode()
-        print("Ricevuto: '%s'" % dati)
-        if dati=='0':
-            print("Chiudo la connessione con " + str(addr_client))
+        step,msg=dati.split(";")
+        print(f"{protocollo[int(step)]}")
+        if step=='3':
+            print("Fine protocollo  " + str(addr_client))
             break
-        dati = "Risposta a : " + str(addr_client) + ". Il valore del contatore è : " + str(contConn)
-
+        dati = str(int(step)+1)+";"+ protocollo[int(step)+1]
+        print(f"Invio: {dati}")
         dati = dati.encode()
-
         sock_service.send(dati)
 
     sock_service.close()
