@@ -13,7 +13,6 @@ while True:
     sock_service, addr_client = sock_listen.accept()
     print("\nConnessione ricevuta da " + str(addr_client))
     print("\nAspetto di ricevere i dati ")
-    step=0
     while True:
         dati = sock_service.recv(2048)
         if not dati:
@@ -22,7 +21,7 @@ while True:
         
         dati = dati.decode()
         print(f"Ricevuto: {dati} - {protocollo[int(dati)]}")
-        if dati=='5':
+        if dati=='4':
             print("Fine protocollo  " + str(addr_client))
             break
         dati = str(int(dati)+1)

@@ -9,11 +9,11 @@ print("Client connesso a " + str((SERVER_ADDRESS, SERVER_PORT)))
 #              send   receive      send            receive
 protocollo = ["SYN", "SYN ACK","ACK with Data","ACK for Data"]
 step=0
-dati = str(step)
+dati = str(0)
 while True:
     dati = dati.encode()
     sock_service.send(dati)
-    print("Invio: "+ str(step)+ " - " + protocollo[step])
+    print("Invio: "+ str(dati)+ " - " + protocollo[int(dati)])
     dati = sock_service.recv(2048)
     if not dati:
         print("Server non risponde. Exit")
@@ -24,9 +24,8 @@ while True:
         print("Termino connessione")
         break
     else:
-        step = int(dati)
-        print("Ricevuto: "+ str(step)+ " - " + protocollo[step])
-        step+=1
-        dati = str(step)
+        print("Ricevuto: "+ dati+ " - " + protocollo[int(dati)])
+        dati = int(dati)+1
+        dati = str(dati)
         
 sock_service.close()
