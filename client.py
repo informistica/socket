@@ -1,37 +1,47 @@
-#!/usr/bin/env python3
-
 import socket
-import random
 
 SERVER_ADDRESS = '127.0.0.1'
-SERVER_PORT = 22224
+SERVER_PORT = 65432
 
-sock_service = socket.socket()
+PROTOCOL = ['SYN', 'SYN ACK', 'ACK with Data', 'ACK for Data']
 
-sock_service.connect((SERVER_ADDRESS, SERVER_PORT))
-
+socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+socket.connect((SERVER_ADDRESS, SERVER_PORT))
 print("Connesso a " + str((SERVER_ADDRESS, SERVER_PORT)))
-protocollo = ["Send SYN", "Receives SYN ACK","Sends ACK with Data"]
-step=0
-syn = random.randint(1,1000)
-dati = str(step)+";"+str(syn)
-while True:
-    dati = dati.encode()
-    sock_service.send(dati)
-    print(protocollo[int(step)])
-    dati = sock_service.recv(2048)
-    print(dati)
-    if not dati:
-        print("Server non risponde. Exit")
-        break
-    dati = dati.decode()
-    step,msg = dati.split(";")
-    if step == '3':
-        print("Termino protocollo")
-        break
-    else:
-        print(str(step)+ protocollo[int(step)])
-       
-    print(dati + '\n')
 
-sock_service.close()
+
+def send(seq):
+    print(f"<-- {seq} {PROTOCOL[seq]}")
+    data = seq.to_bytes(1, 'big')
+    socket.send(data)
+
+
+def recv():
+    data = socket.recv(2048)
+
+    if not data:
+        return None
+
+    seq = int.from_bytes(data, 'big')
+    print(f"--> {seq} {PROTOCOL[seq]}")
+    return seq
+
+
+if __name__ == '__main__':
+    # invia pacchetto iniziale: SYN
+    send(0)
+
+    while True:
+        seq = recv()
+
+        if seq == None:
+            print("Server non risponde. Exit")
+            break
+
+        if seq >= len(PROTOCOL) - 1:
+            print("sequenza terminata")
+            break
+
+        send(seq + 1)
+
+    socket.close()
