@@ -22,7 +22,6 @@ with sock_service as ss:
         dati.decode()
         if not dati:
             break
-        dati = dati.decode()
         print("Ricevuto '%s' dal client" % dati)
         dati = "Ciao, " + str(address_client) + ". Ho ricevuto questo: '" + dati + "'"
         dati = dati.encode()
