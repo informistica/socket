@@ -16,7 +16,7 @@ import socket
 
 HOST = '127.0.0.1'  # Indirizzo dell'interfaccia standard di loopback (localhost)
 PORT = 65432        # Porta di ascolto, la lista di quelle utilizzabili parte da >1023)
-
+#https://www.pythonforbeginners.com/files/with-statement-in-python
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock_listen:
     sock_listen.bind((HOST, PORT))
     sock_listen.listen()
