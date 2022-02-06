@@ -19,13 +19,13 @@ global num_service
 
 
 def ricevi_comandi(sock_service, addr_client,num_service):
-    print("Client PID: %s, Process Name: %s, Thread Name: %s" % (
+    print("Server PID: %s, Process Name: %s, Thread Name: %s" % (
         os.getpid(),
         multiprocessing.current_process().name,
         threading.current_thread().name)
     )
-    print(f"Avviato il {num_service} thread per servire le richieste da %s" % str(addr_client))
-    print(f"{threading.current_thread().name} Aspetto di ricevere i dati dell'operazione ")
+    print(f"\nAvviato il thread-{num_service} per servire le richieste da %s" % str(addr_client))
+    print(f"\n{threading.current_thread().name} Aspetto di ricevere i dati dell'operazione ")
     while True:
         dati = sock_service.recv(2048)
         if not dati:
@@ -34,9 +34,9 @@ def ricevi_comandi(sock_service, addr_client,num_service):
 
         # Decodifica i byte ricevuti in una stringa unicode
         dati = dati.decode()
-        print(f"{threading.current_thread().name} Ricevuto: '%s'" % dati)
+        print(f"\n{threading.current_thread().name} Ricevuto: '%s'" % dati)
         if dati == "ko":
-            print(f"{threading.current_thread().name} Fine dati dal client. Exit")
+            print(f"\n{threading.current_thread().name} Fine dati dal client. Exit")
             break
         operazione = dati
         op, n1, n2 = dati.split(";")
@@ -53,7 +53,7 @@ def ricevi_comandi(sock_service, addr_client,num_service):
                 dati = str(float(n1) / float(n2))
 
         dati = "Il risultato dell'operazione: '" + op + "' tra '" + str(n1) + "' e '" + str(n2) + "' è: '" + dati + "'"
-        print(f"{threading.current_thread().name} Invio il risultato dell'operazione %s a %s\n" % (operazione, addr_client))
+        print(f"\n{threading.current_thread().name} Invio il risultato dell'operazione %s a %s\n" % (operazione, addr_client))
         # codifica la stringa in byte
         dati = dati.encode()
         # Invia la risposta al client.
@@ -64,8 +64,8 @@ def ricevi_connessioni(sock_listen,num_service):
     while True:
         sock_service, addr_client = sock_listen.accept()
         num_service+=1
-        print("\nConnessione ricevuta da %s" % str(addr_client))
-        print(f"Creo thread per servire la connessione n. {num_service}")
+        print(f"\nN-{num_service} connessione ricevuta da %s" % str(addr_client))
+        print(f"Creo thread-{num_service} per servire la connessione {num_service} da %s" % str(addr_client))
         try:
             Thread(target=ricevi_comandi, args=(sock_service, addr_client,num_service)).start()
         except:
