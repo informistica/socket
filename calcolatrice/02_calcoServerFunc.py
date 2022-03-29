@@ -3,7 +3,7 @@ from threading import Thread
 
 
 SERVER_ADDRESS = '127.0.0.1'
-SERVER_PORT = 22224
+SERVER_PORT = 22225
 
 def ricevi_comandi(sock_service,addr_client):
     print("avviato")
