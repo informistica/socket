@@ -29,7 +29,6 @@ def genera_richieste1(num,address,port):
     #   di una materia(valori ammessi: Matematica, Italiano, inglese, Storia e Geografia)
     #   di un voto (valori ammessi 1 ..10)
     #   delle assenze (valori ammessi 1..5) 
-
     studenti=['Studente0','Studente1','Studente2','Studente3','Studente4']
     materie=['Matematica','Italiano','inglese','Storia e Geografia']
     voto=random.randint(1,10)
@@ -54,7 +53,7 @@ def genera_richieste1(num,address,port):
         print(f"{threading.current_thread().name}: Server non risponde. Exit")
     else:
         # completare:
-        #1. recuperare studente, materia, voto e assenze
+        #1. recuperare studente, materia e valutazione
         studente=data['studente']
         materia=data['materia']
         print(f"{threading.current_thread().name}: La valutazione di {data['studente']} in {data['materia']} è {data['valutazione']} ")
@@ -138,7 +137,6 @@ def genera_richieste3(num,address,port):
             assenze=random.randint(1,5)
             pagella.append((m,voto,assenze))
         tabellone[stud]=pagella
-
     #2. comporre il messaggio, inviarlo come json e ricevere il risultato
     #messaggio={'studente':studente,
     #'pagella':pagella}
@@ -152,7 +150,6 @@ def genera_richieste3(num,address,port):
     data=json.loads(data)
     print("Dati ricevuti dal server")
     pp.pprint(data) 
-
 
     if not data:
         print(f"{threading.current_thread().name}: Server non risponde. Exit")
@@ -171,16 +168,21 @@ if __name__ == '__main__':
     # PUNTO A) ciclo per chiamare NUM_WORKERS volte la funzione genera richieste (1,2,3)
     # alla quale passo i parametri (num,SERVER_ADDRESS, SERVER_PORT)
     for num in range (0,NUM_WORKERS):
-        genera_richieste2(num,SERVER_ADDRESS, SERVER_PORT)
+        genera_richieste1(num,SERVER_ADDRESS, SERVER_PORT)
+        #genera_richieste2(num,SERVER_ADDRESS, SERVER_PORT)
+        #genera_richieste3(num,SERVER_ADDRESS, SERVER_PORT)
     end_time=time.time()
     print("Total SERIAL time=", end_time - start_time)
+
     start_time=time.time()
     threads=[]
     # PUNTO B) ciclo per chiamare NUM_WORKERS volte la funzione genera richieste (1,2,3)  
     # tramite l'avvio di un thread al quale passo i parametri args=(num,SERVER_ADDRESS, SERVER_PORT,)
     # avviare tutti i thread e attenderne la fine
     for num in range(NUM_WORKERS):
-        threads.append(threading.Thread(target=genera_richieste2, args=(num,SERVER_ADDRESS, SERVER_PORT,)))
+        threads.append(threading.Thread(target=genera_richieste1, args=(num,SERVER_ADDRESS, SERVER_PORT,)))
+        #threads.append(threading.Thread(target=genera_richieste2, args=(num,SERVER_ADDRESS, SERVER_PORT,)))
+        #threads.append(threading.Thread(target=genera_richieste3, args=(num,SERVER_ADDRESS, SERVER_PORT,)))
     [thread.start() for thread in threads]
     [thread.join() for thread in threads]
     end_time=time.time()
@@ -192,7 +194,9 @@ if __name__ == '__main__':
     # tramite l'avvio di un processo al quale passo i parametri args=(num,SERVER_ADDRESS, SERVER_PORT,)
     # avviare tutti i processi e attenderne la fine
     for num in range(NUM_WORKERS):
-        process.append(multiprocessing.Process(target=genera_richieste2, args=(num,SERVER_ADDRESS, SERVER_PORT,)))
+        process.append(multiprocessing.Process(target=genera_richieste1, args=(num,SERVER_ADDRESS, SERVER_PORT,)))
+        #process.append(multiprocessing.Process(target=genera_richieste2, args=(num,SERVER_ADDRESS, SERVER_PORT,)))
+        #process.append(multiprocessing.Process(target=genera_richieste3, args=(num,SERVER_ADDRESS, SERVER_PORT,)))
     [process.start() for process in process]
     [process.join() for process in process]
     end_time=time.time()
