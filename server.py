@@ -46,7 +46,6 @@ while True:
         n1 = dati["primoNumero"]
         operazione = dati["operazione"]
         n2 = dati["secondoNumero"]
-        print("32",n1,n2,operazione)
         if operazione == "0":
             print("Fine dati dal client. Exit")
             break
@@ -62,8 +61,8 @@ while True:
             else:
                 risultato = float(n1) / float(n2)
 
-        print("Il risultato dell'operazione: '" + operazione + "' tra '" + str(n1) + "' e '" + str(n2) + "' è: '" + str(risultato) + "'")
-        print("Invio il risultato dell'operazione %s a %s\n" % (operazione, addr_client))
+        print(f"{n1} {operazione} {n2} = {risultato}")
+        print(f"Invio il risultato a {addr_client}")
         # codifica la stringa in byte
         dati = str(risultato).encode()
         # Invia la risposta al client.
