@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import socket
+import socket,json
 
 # lasciando il campo vuoto sarebbe la stessa cosa (localhost)
 SERVER_ADDRESS = '127.0.0.1'
@@ -42,29 +42,32 @@ while True:
 
         # Decodifica i byte ricevuti in una stringa unicode
         dati = dati.decode()
-        print("Ricevuto: '%s'" % dati)
-        if dati == "ko":
+        dati = json.loads(dati)
+        n1 = dati["primoNumero"]
+        operazione = dati["operazione"]
+        n2 = dati["secondoNumero"]
+        print("32",n1,n2,operazione)
+        if operazione == "0":
             print("Fine dati dal client. Exit")
             break
-        op, n1, n2 = dati.split(";")
-        if op == "piu":
-            dati = str(float(n1) + float(n2))
-        elif op == "meno":
-            dati = str(float(n1) - float(n2))
-        elif op == "per":
-            dati = str(float(n1) * float(n2))
-        elif op == "diviso":
-            if n2=='0':
-                dati='Divisione per zero impossibile'
+        elif operazione == "+":
+            risultato = float(n1) + float(n2)
+        elif operazione == "-":
+            risultato = float(n1) - float(n2)
+        elif operazione == "*":
+            risultato = float(n1) * float(n2)
+        elif operazione == "/":
+            if n2 == '0':
+                risultato = 'Divisione per zero impossibile'
             else:
-                dati = str(float(n1) / float(n2))
+                risultato = float(n1) / float(n2)
 
-        dati = "Il risultato dell'operazione: '" + op + "' tra '" + str(n1) + "' e '" + str(n2) + "' è: '" + dati + "'"
-
+        print("Il risultato dell'operazione: '" + operazione + "' tra '" + str(n1) + "' e '" + str(n2) + "' è: '" + str(risultato) + "'")
+        print("Invio il risultato dell'operazione %s a %s\n" % (operazione, addr_client))
         # codifica la stringa in byte
-        dati = dati.encode()
-
+        dati = str(risultato).encode()
         # Invia la risposta al client.
         sock_service.send(dati)
+
 
     sock_service.close()
