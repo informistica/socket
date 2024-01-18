@@ -10,8 +10,9 @@ SERVER_PORT = 22224
 
 
 # La funzione avvia_server crea un endpoint di ascolto (sock_listen) dal quale accettare connessioni in entrata
-# la socket di ascolto viene passata alla funzione ricevi_comandi la quale accetta richieste di connessione
-# e per ognuna crea una socket per i dati (sock_service) da cui ricevere le richieste e inviare le risposte
+# la socket di ascolto viene passata alla funzione ricevi_connessioni la quale accetta richieste di connessione
+# e per ognuna crea una socket per i dati (sock_service) che viene passata come parametro ad una funzione ricevi_comandi 
+# eseguita da un thread per servire le richieste di uno specifico client  
 
 
 def ricevi_comandi(sock_service, addr_client):
@@ -77,7 +78,7 @@ def avvia_server(indirizzo, porta):
         sock_listen.bind((indirizzo, porta))
         # Imposta quante connessioni pendenti possono essere accodate
         sock_listen.listen(5)
-        print("Server in ascolto su %s. Termina con ko" % str((indirizzo, porta)))
+        print("Server in ascolto su %s. Termina con 0" % str((indirizzo, porta)))
     except socket.error as errore:
         print(f"Qualcosa è andato storto... \n{errore}")
 
@@ -86,4 +87,4 @@ def avvia_server(indirizzo, porta):
 
 if __name__ == '__main__':
     avvia_server(SERVER_ADDRESS, SERVER_PORT)
-print("ciao")       
+print("Termina")       
